@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chương trình tính thuế thu nhập</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #e0f2fe, #eef2ff);
+      color: #1f2937;
+    }
+    .container {
+      width: 100%;
+      max-width: 520px;
+      padding: 30px;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 12px 35px rgba(15, 23, 42, 0.12);
+    }
+    h1 {
+      margin: 0 0 26px;
+      text-align: center;
+      color: #1d4ed8;
+      font-size: 24px;
+    }
+    .form-group { margin-bottom: 18px; }
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+    select, input {
+      width: 100%;
+      padding: 12px 13px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 16px;
+      outline: none;
+    }
+    select:focus, input:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, .12);
+    }
+    .buttons { display: flex; gap: 12px; margin-top: 24px; }
+    button {
+      flex: 1;
+      padding: 12px;
+      border: 0;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .calculate { background: #2563eb; color: white; }
+    .calculate:hover { background: #1d4ed8; }
+    .clear { background: #e5e7eb; color: #374151; }
+    .clear:hover { background: #d1d5db; }
+    .result {
+      margin-top: 22px;
+      padding: 16px;
+      border-radius: 10px;
+      background: #eff6ff;
+      color: #1d4ed8;
+      line-height: 1.6;
+      overflow-wrap: anywhere;
+    }
+    .result.error { background: #fef2f2; color: #b91c1c; }
+    @media (max-width: 420px) {
+      .container { padding: 22px; }
+      h1 { font-size: 21px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <h1>TÍNH THUẾ THU NHẬP</h1>
+
+    <div class="form-group">
+      <label for="coNha">Có nhà ở không?</label>
+      <select id="coNha">
+        <option value="">-- Chọn --</option>
+        <option value="Co">Có</option>
+        <option value="Khong">Không</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="thuNhap">Tổng thu nhập (VND):</label>
+      <input id="thuNhap" type="number" min="0" step="any" placeholder="Nhập tổng thu nhập">
+    </div>
+
+    <div class="buttons">
+      <button class="calculate" id="btnTinh" type="button">Tính thuế</button>
+      <button class="clear" id="btnXoa" type="button">Xóa</button>
+    </div>
+
+    <div class="result" id="ketQua" role="status" aria-live="polite">
+      Kết quả sẽ hiển thị tại đây
+    </div>
+  </main>
+
+  <script>
+    const chonNha = document.getElementById("coNha");
+    const txtThuNhap = document.getElementById("thuNhap");
+    const ketQua = document.getElementById("ketQua");
+
+    function hienThiLoi(thongBao) {
+      ketQua.textContent = thongBao;
+      ketQua.classList.add("error");
+    }
+
+    function tinhThue() {
+      const coNha = chonNha.value;
+      const thuNhapNhap = txtThuNhap.value.trim();
+
+      ketQua.classList.remove("error");
+
+      if (coNha === "") {
+        hienThiLoi("Vui lòng chọn Có hoặc Không!");
+        return;
+      }
+
+      if (coNha === "Khong") {
+        ketQua.textContent = "Thuế suất: 4%";
+        return;
+      }
+
+      if (thuNhapNhap === "") {
+        hienThiLoi("Tổng thu nhập không được để trống!");
+        return;
+      }
+
+      const thuNhap = Number(thuNhapNhap);
+
+      if (!Number.isFinite(thuNhap) || thuNhap < 0) {
+        hienThiLoi("Thu nhập phải là số không âm hợp lệ!");
+        return;
+      }
+
+      const thueSuat = thuNhap > 5000000 ? 0.06 : 0.04;
+      const tienThue = thuNhap * thueSuat;
+      const tienThueHienThi = tienThue.toLocaleString("vi-VN", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+
+      ketQua.textContent = `Thuế suất: ${thueSuat * 100}% - ${tienThueHienThi} VND`;
+    }
+
+    function xoaDuLieu() {
+      chonNha.selectedIndex = 0;
+      txtThuNhap.value = "";
+      ketQua.textContent = "Kết quả sẽ hiển thị tại đây";
+      ketQua.classList.remove("error");
+    }
+
+    document.getElementById("btnTinh").addEventListener("click", tinhThue);
+    document.getElementById("btnXoa").addEventListener("click", xoaDuLieu);
+  </script>
+</body>
+</html>
